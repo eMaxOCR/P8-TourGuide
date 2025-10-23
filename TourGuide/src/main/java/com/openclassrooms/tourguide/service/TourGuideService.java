@@ -115,8 +115,8 @@ public class TourGuideService {
 	 */
 	public AttractionProximity getNearByAttractions(String userName) {
 		AttractionProximity attractionProximity = new AttractionProximity(); 
-		List<NearbyAttractionDTO> listDistanceBetween = getDistanceBetweenUserAndAllAttraction(userName,5);	 //List of distance between user and attractions.
-		VisitedLocation userLocation = getUserLocation(getUser(userName));									 //Collect user location
+		List<NearbyAttractionDTO> listDistanceBetween = getDistanceBetweenUserAndAllAttraction(userName, 5);	 //List of distance between user and attractions.
+		VisitedLocation userLocation = getUserLocation(getUser(userName));		//Collect user location
 		
 		attractionProximity.setUserName(userName);
 		attractionProximity.setUserLocation(userLocation.location);
