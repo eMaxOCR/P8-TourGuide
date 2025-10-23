@@ -1,7 +1,11 @@
 package com.openclassrooms.tourguide.service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -17,6 +21,7 @@ import com.openclassrooms.tourguide.model.UserReward;
 @Service
 public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
+    private final ExecutorService executorService = Executors.newCachedThreadPool(); //Create scalable pool thread
 
 	// proximity in miles
     private int defaultProximityBuffer = 10;
@@ -36,6 +41,17 @@ public class RewardsService {
 	
 	public void setDefaultProximityBuffer() {
 		proximityBuffer = defaultProximityBuffer;
+	}
+	
+	public void calculateMultipleRewards(List<User> users) {
+		
+		List<CompletableFuture<Void>> futures = users.stream()
+				.map(user -> CompletableFuture.runAsync(() -> {
+					calculateRewards(user);
+				}, executorService))
+				.collect(Collectors.toList());
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+		
 	}
 	
 	public void calculateRewards(User user) {

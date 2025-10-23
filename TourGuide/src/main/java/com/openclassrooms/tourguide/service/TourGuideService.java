@@ -5,6 +5,7 @@ import com.openclassrooms.tourguide.mapper.NearyAttractionMapper;
 import com.openclassrooms.tourguide.model.AttractionProximity;
 import com.openclassrooms.tourguide.model.NearbyAttraction;
 import com.openclassrooms.tourguide.model.User;
+import com.openclassrooms.tourguide.model.UserPreferences;
 import com.openclassrooms.tourguide.model.UserReward;
 import com.openclassrooms.tourguide.model.DTO.NearbyAttractionDTO;
 import com.openclassrooms.tourguide.tracker.Tracker;
@@ -90,9 +91,12 @@ public class TourGuideService {
 
 	public List<Provider> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
-		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(),
-				user.getUserPreferences().getNumberOfAdults(), user.getUserPreferences().getNumberOfChildren(),
-				user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
+		List<Provider> providers = tripPricer.getPrice(
+				tripPricerApiKey, user.getUserId(),
+				user.getUserPreferences().getNumberOfAdults(), 
+				user.getUserPreferences().getNumberOfChildren(),
+				user.getUserPreferences().getTripDuration(), 
+				cumulatativeRewardPoints);
 		user.setTripDeals(providers);
 		return providers;
 	}
@@ -212,6 +216,7 @@ public class TourGuideService {
 			String phone = "000";
 			String email = userName + "@tourGuide.com";
 			User user = new User(UUID.randomUUID(), userName, phone, email);
+			
 			generateUserLocationHistory(user);
 
 			internalUserMap.put(userName, user);
