@@ -101,6 +101,34 @@ public class TourGuideService {
 		return providers;
 	}
 
+	public List<VisitedLocation> trackMultipleUserLocation(List<User> users) {
+		
+		//Creating threads for each users and trackUserLocation
+		List<CompletableFuture<VisitedLocation>> futures = users.stream()
+				.map(user -> CompletableFuture.supplyAsync(() ->
+						trackUserLocation(user)
+					)
+					//Void crash if no informations found. Return null to continue.
+					.exceptionally (e -> {
+						System.out.println("Il y a eu une erreur pour récupérer les données de l'utilisateur : " + user.getUserName() + ". Error : " + e);
+						return null;
+					}))
+				.collect(Collectors.toList());
+		
+		
+		List<VisitedLocation> visitedLocations = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+				.thenApply(v -> {
+					return futures.stream()
+							.filter(location -> location != null) //Void null locations.
+							.map(CompletableFuture::join)
+							.collect(Collectors.toList());
+				})
+				.join();
+		
+		return visitedLocations;
+
+	}
+	
 	public VisitedLocation trackUserLocation(User user) {
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
