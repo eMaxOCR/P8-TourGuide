@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AttractionProximity {
+public class AttractionsProximity {
 	
 	private String userName;
 	private Location userLocation;

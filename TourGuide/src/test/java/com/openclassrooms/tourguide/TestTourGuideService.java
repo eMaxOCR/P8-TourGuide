@@ -9,7 +9,7 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
 import com.openclassrooms.tourguide.helper.InternalTestHelper;
-import com.openclassrooms.tourguide.model.AttractionProximity;
+import com.openclassrooms.tourguide.model.AttractionsProximity;
 import com.openclassrooms.tourguide.model.User;
 import com.openclassrooms.tourguide.service.RewardsService;
 import com.openclassrooms.tourguide.service.TourGuideService;
@@ -101,7 +101,7 @@ public class TestTourGuideService {
 
 		tourGuideService.addUser(user);
 
-		AttractionProximity attractions = tourGuideService.getNearByAttractions(user.getUserName());
+		AttractionsProximity attractions = tourGuideService.getNearByAttractions(user.getUserName());
 
 		//VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
 		//List<Attraction> attractions = tourGuideService.getNearByAttractions(visitedLocation);
@@ -110,8 +110,8 @@ public class TestTourGuideService {
 
 		assertEquals(5, attractions.getNearestAttractions().size());
 	}
-
 	
+	//This test isn't implemented
 	public void getTripDeals() {
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());

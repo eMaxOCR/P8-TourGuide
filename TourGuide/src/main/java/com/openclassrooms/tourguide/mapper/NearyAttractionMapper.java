@@ -1,8 +1,11 @@
 package com.openclassrooms.tourguide.mapper;
 
+import org.springframework.stereotype.Service;
+
 import com.openclassrooms.tourguide.model.NearbyAttraction;
 import com.openclassrooms.tourguide.model.DTO.NearbyAttractionDTO;
 
+@Service
 public class NearyAttractionMapper {
 
 	/**

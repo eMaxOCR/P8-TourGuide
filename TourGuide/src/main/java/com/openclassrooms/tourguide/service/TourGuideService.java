@@ -1,8 +1,9 @@
 package com.openclassrooms.tourguide.service;
 
 import com.openclassrooms.tourguide.helper.InternalTestHelper;
+import com.openclassrooms.tourguide.mapper.AttractionsProximityMapper;
 import com.openclassrooms.tourguide.mapper.NearyAttractionMapper;
-import com.openclassrooms.tourguide.model.AttractionProximity;
+import com.openclassrooms.tourguide.model.AttractionsProximity;
 import com.openclassrooms.tourguide.model.NearbyAttraction;
 import com.openclassrooms.tourguide.model.User;
 import com.openclassrooms.tourguide.model.UserPreferences;
@@ -47,6 +48,7 @@ public class TourGuideService {
 	private RewardCentral rewardCentral = new RewardCentral();
 	boolean testMode = true;
 	private NearyAttractionMapper nearyAttractionMapper = new NearyAttractionMapper();
+	private AttractionsProximityMapper attractionsProximityMapper = new AttractionsProximityMapper();
 	private final ExecutorService executorService = Executors.newCachedThreadPool(); //Create scalable pool thread
 
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
@@ -101,7 +103,7 @@ public class TourGuideService {
 		return providers;
 	}
 
-	public List<VisitedLocation> trackMultipleUserLocation(List<User> users) {
+	public List<VisitedLocation> trackUsersLocation(List<User> users) {
 		
 		//Creating threads for each users and trackUserLocation
 		List<CompletableFuture<VisitedLocation>> futures = users.stream()
@@ -145,16 +147,14 @@ public class TourGuideService {
 	 * @param userName The name of the user to search for.
 	 * @return An object that contains the user's location and a list of the five closest attractions.
 	 */
-	public AttractionProximity getNearByAttractions(String userName) {
-		AttractionProximity attractionProximity = new AttractionProximity(); 
-		List<NearbyAttractionDTO> listDistanceBetween = getDistanceBetweenUserAndAllAttraction(userName, 5);	 //List of distance between user and attractions.
+	public AttractionsProximity getNearByAttractions(String userName) {
+		AttractionsProximity attractionsProximity = new AttractionsProximity(); 
+		List<NearbyAttractionDTO> listDistanceBetween = getDistanceBetweenUserAndAllAttractions(userName, 5);	 //List of distance between user and attractions.
 		VisitedLocation userLocation = getUserLocation(getUser(userName));		//Collect user location
 		
-		attractionProximity.setUserName(userName);
-		attractionProximity.setUserLocation(userLocation.location);
-		attractionProximity.setNearestAttractions(listDistanceBetween);
+		attractionsProximity = attractionsProximityMapper.toAttractionsProximity(userName, userLocation.location, listDistanceBetween);
 		
-		return attractionProximity;
+		return attractionsProximity;
 	}
 
 	private void addShutDownHook() {
@@ -175,7 +175,7 @@ public class TourGuideService {
 	 * @param limit    The maximum number of attractions to include in the list.
 	 * @return         A sorted list of "ClosestAttractions" objects.
 	 */
-	public List<NearbyAttractionDTO> getDistanceBetweenUserAndAllAttraction(String userName, Integer limit){
+	public List<NearbyAttractionDTO> getDistanceBetweenUserAndAllAttractions(String userName, Integer limit){
 		
 		//get all attractions.
 		List<Attraction> attractions = gpsUtil.getAttractions();

@@ -43,7 +43,7 @@ public class RewardsService {
 		proximityBuffer = defaultProximityBuffer;
 	}
 	
-	public void calculateMultipleRewards(List<User> users) {
+	public void calculateUsersRewards(List<User> users) {
 		
 		List<CompletableFuture<Void>> futures = users.stream()
 				.map(user -> CompletableFuture.runAsync(() -> {
