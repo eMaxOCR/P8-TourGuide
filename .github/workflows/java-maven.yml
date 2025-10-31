@@ -31,7 +31,7 @@ jobs:
         cache: maven
         
     - name: Build with Maven
-      run: mvn -B clean install --file pom.xml
+      run: mvn -B clean install --file TourGuide/pom.xml
 
     - name: Téléverser l'Artifact
       uses: actions/upload-artifact@v4
