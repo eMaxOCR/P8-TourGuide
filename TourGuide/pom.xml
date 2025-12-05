@@ -18,6 +18,7 @@
 		<java.version>17</java.version>
 	</properties>
 
+
 	<repositories>
 		<repository>
 			<id>in-project-dependencies</id>
@@ -79,25 +80,6 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>gpsUtil</groupId>
-			<artifactId>gpsUtil</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>tripPricer</groupId>
-			<artifactId>tripPricer</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>rewardCentral</groupId>
-			<artifactId>rewardCentral</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-
 
 	</dependencies>
 

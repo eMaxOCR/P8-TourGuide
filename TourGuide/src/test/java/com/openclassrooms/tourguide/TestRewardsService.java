@@ -2,14 +2,10 @@ package com.openclassrooms.tourguide;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
 import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;

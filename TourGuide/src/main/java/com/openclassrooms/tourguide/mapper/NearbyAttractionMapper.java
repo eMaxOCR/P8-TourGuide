@@ -6,7 +6,7 @@ import com.openclassrooms.tourguide.model.NearbyAttraction;
 import com.openclassrooms.tourguide.model.DTO.NearbyAttractionDTO;
 
 @Service
-public class NearyAttractionMapper {
+public class NearbyAttractionMapper {
 
 	/**
      * Convert NearbyAttraction to NearbyAttractionDTO

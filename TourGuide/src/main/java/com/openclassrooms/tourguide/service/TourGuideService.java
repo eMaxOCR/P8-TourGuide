@@ -2,7 +2,7 @@ package com.openclassrooms.tourguide.service;
 
 import com.openclassrooms.tourguide.helper.InternalTestHelper;
 import com.openclassrooms.tourguide.mapper.AttractionsProximityMapper;
-import com.openclassrooms.tourguide.mapper.NearyAttractionMapper;
+import com.openclassrooms.tourguide.mapper.NearbyAttractionMapper;
 import com.openclassrooms.tourguide.model.AttractionsProximity;
 import com.openclassrooms.tourguide.model.NearbyAttraction;
 import com.openclassrooms.tourguide.model.User;
@@ -47,7 +47,7 @@ public class TourGuideService {
 	public final Tracker tracker;
 	private RewardCentral rewardCentral = new RewardCentral();
 	boolean testMode = true;
-	private NearyAttractionMapper nearyAttractionMapper = new NearyAttractionMapper();
+	private NearbyAttractionMapper nearyAttractionMapper = new NearbyAttractionMapper();
 	private AttractionsProximityMapper attractionsProximityMapper = new AttractionsProximityMapper();
 	private final ExecutorService executorService = Executors.newCachedThreadPool(); //Create scalable pool thread
 
@@ -67,30 +67,65 @@ public class TourGuideService {
 		addShutDownHook();
 	}
 
+	/**
+	 * Retrieves the list of rewards associated with a user.
+	 *
+	 * @param user 
+	 * @return a thread list of objects associated with the user
+	 */
 	public CopyOnWriteArrayList<UserReward> getUserRewards(User user) {
 		return user.getUserRewards();
 	}
 
+	/**
+	 * Retrieves the most recent location of a user.
+	 *
+	 * @param user 
+	 * @return VisitedLocation
+	 */
 	public VisitedLocation getUserLocation(User user) {
 		VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ? user.getLastVisitedLocation()
 				: trackUserLocation(user);
 		return visitedLocation;
 	}
 
+	/**
+	 * Retrieves a user by their userName.
+	 *
+	 * @param String userName 
+	 * @return User
+	 */
 	public User getUser(String userName) {
 		return internalUserMap.get(userName);
 	}
 
+	/**
+	 * Retrieves a list of all users stored in the system.
+	 *
+	 * @return List Users
+	 */
 	public List<User> getAllUsers() {
 		return internalUserMap.values().stream().collect(Collectors.toList());
 	}
 
+	/**
+	 * Adds a new user to the internal user map.
+	 *
+	 * @param User
+	 */
 	public void addUser(User user) {
 		if (!internalUserMap.containsKey(user.getUserName())) {
 			internalUserMap.put(user.getUserName(), user);
 		}
 	}
 
+	/**
+	 * Retrieves a list of trip deals for a given user based on their preferences
+	 * and accumulated reward points.
+	 *
+	 * @param User 
+	 * @return List Provider
+	 */
 	public List<Provider> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
 		List<Provider> providers = tripPricer.getPrice(
@@ -103,6 +138,16 @@ public class TourGuideService {
 		return providers;
 	}
 
+	/**
+	 * Tracks the current locations of a list of users asynchronously.
+	 * 
+	 * For each user, this method submits a task to track their location in parallel.
+	 * If an exception occurs while retrieving a user's location, it logs the error
+	 * and continues processing other users.
+	 *
+	 * @param List User
+	 * @return List VisitedLocation
+	 */
 	public List<VisitedLocation> trackUsersLocation(List<User> users) {
 		
 		//Creating threads for each users and trackUserLocation
@@ -131,6 +176,12 @@ public class TourGuideService {
 
 	}
 	
+	/**
+	 * Tracks the current location of a single user and updates their rewards.
+	 *
+	 * @param User 
+	 * @return VisitedLocation
+	 */
 	public VisitedLocation trackUserLocation(User user) {
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
@@ -140,12 +191,11 @@ public class TourGuideService {
 
 	/**
 	 * Gets the five closest tourist attractions for a given user.
-	 *
 	 * This method finds the user's last known location.
 	 * Then, it calculates which five attractions are the nearest.
 	 *
-	 * @param userName The name of the user to search for.
-	 * @return An object that contains the user's location and a list of the five closest attractions.
+	 * @param String userName 
+	 * @return AttractionsProximity
 	 */
 	public AttractionsProximity getNearByAttractions(String userName) {
 		AttractionsProximity attractionsProximity = new AttractionsProximity(); 
@@ -157,6 +207,9 @@ public class TourGuideService {
 		return attractionsProximity;
 	}
 
+	/**
+	 * Adds a JVM shutdown hook to gracefully stop the user location tracker.
+	 */
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
@@ -173,7 +226,7 @@ public class TourGuideService {
 	 *
 	 * @param userName The name of the user to locate.
 	 * @param limit    The maximum number of attractions to include in the list.
-	 * @return         A sorted list of "ClosestAttractions" objects.
+	 * @return NearbyAttractionDTO A sorted list of "ClosestAttractions" objects.
 	 */
 	public List<NearbyAttractionDTO> getDistanceBetweenUserAndAllAttractions(String userName, Integer limit){
 		
@@ -238,6 +291,11 @@ public class TourGuideService {
 	// internal users are provided and stored in memory
 	private final Map<String, User> internalUserMap = new HashMap<>();
 
+	/**
+	 * Creates and sets up the internal test users.
+	 * Each user is given a simple profile (name, phone, email) 
+	 * and a unique ID (UUID).
+	 */
 	private void initializeInternalUsers() {
 		IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {
 			String userName = "internalUser" + i;
@@ -252,6 +310,11 @@ public class TourGuideService {
 		logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
 	}
 
+	/**
+	 * * Creates a short, simulated travel history for a given test user.
+	 * This method adds 3 random locations to the user's list of visited places.
+	 * @param user
+	 * */
 	private void generateUserLocationHistory(User user) {
 		IntStream.range(0, 3).forEach(i -> {
 			user.addToVisitedLocations(new VisitedLocation(user.getUserId(),
@@ -259,18 +322,30 @@ public class TourGuideService {
 		});
 	}
 
+	/**
+	 * Generates a random longitude value.
+	 * @return double
+	 * */
 	private double generateRandomLongitude() {
 		double leftLimit = -180;
 		double rightLimit = 180;
 		return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
 	}
 
+	/**
+	 * Generates a random latitude value.
+	 * @return double
+	 * */
 	private double generateRandomLatitude() {
 		double leftLimit = -85.05112878;
 		double rightLimit = 85.05112878;
 		return leftLimit + new Random().nextDouble() * (rightLimit - leftLimit);
 	}
-
+	
+	/**
+	 * Generates a random latitude value.
+	 * @return Date
+	 * */
 	private Date getRandomTime() {
 		LocalDateTime localDateTime = LocalDateTime.now().minusDays(new Random().nextInt(30));
 		return Date.from(localDateTime.toInstant(ZoneOffset.UTC));

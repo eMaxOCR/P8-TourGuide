@@ -43,6 +43,16 @@ public class RewardsService {
 		proximityBuffer = defaultProximityBuffer;
 	}
 	
+	/**
+	 * Calculates rewards for a list of users asynchronously.
+	 * 
+	 * For each user in the provided list, this method submits a task to an
+	 * executor service to compute the user's rewards in parallel. It then waits
+	 * for all asynchronous computations to complete before returning.
+	 *
+	 * @param List users 
+	 *
+	 */
 	public void calculateUsersRewards(List<User> users) {
 		
 		List<CompletableFuture<Void>> futures = users.stream()
@@ -54,6 +64,15 @@ public class RewardsService {
 		
 	}
 	
+	/**
+	 * Calculates and assigns reward points to a user based on their visited
+	 * locations and nearby attractions.
+	 * 
+	 * For each location the user has visited, this method checks all available
+	 * attractions. 
+	 *
+	 * @param user
+	 */
 	public void calculateRewards(User user) {
 		CopyOnWriteArrayList<VisitedLocation> userLocations = user.getVisitedLocations();
 		List<Attraction> attractions = gpsUtil.getAttractions();
@@ -69,18 +88,49 @@ public class RewardsService {
 		}
 	}
 	
+	/**
+	 * Determines whether a given location is within the configured proximity
+	 * range of an attraction.
+	 *
+	 * @param attraction 
+	 * @param location   
+	 * @return Boolean
+	 */
 	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
 		return getDistance(attraction, location) > attractionProximityRange ? false : true;
 	}
 	
+	/**
+	 * Checks whether a visited location is within the defined proximity buffer
+	 * of a specified attraction.
+	 * 
+	 * @param visitedLocation 
+	 * @param attraction      
+	 * @return Boolean
+	 */
 	private boolean nearAttraction(VisitedLocation visitedLocation, Attraction attraction) {
 		return getDistance(attraction, visitedLocation.location) > proximityBuffer ? false : true;
 	}
 	
+	/**
+	 * Retrieves the reward points associated with a specific attraction for a given user.
+	 *
+	 * @param attraction 
+	 * @param user       
+	 * @return integer
+	 */
 	private int getRewardPoints(Attraction attraction, User user) {
 		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
 	}
 	
+	/**
+	 * Calculates the distance in statute miles between two geographic locations.
+	 * Return the distance between the two locations in statute miles
+	 *
+	 * @param loc1 the first location
+	 * @param loc2 the second location
+	 * @return Double
+	 */
 	public double getDistance(Location loc1, Location loc2) {
         double lat1 = Math.toRadians(loc1.latitude);
         double lon1 = Math.toRadians(loc1.longitude);

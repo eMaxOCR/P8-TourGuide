@@ -19,26 +19,57 @@ public class TourGuideController {
 	@Autowired
 	TourGuideService tourGuideService;
 	
+	/**
+	 * Handles HTTP GET requests to the root URL ("/") of the application.
+	 * This method returns a simple greeting message indicating that the TourGuide
+	 * service is running. 
+	 *
+	 * @return Json with greeting message
+	 */
     @RequestMapping("/")
     public String index() {
         return "Greetings from TourGuide!";
     }
     
+    /**
+     * Handles HTTP GET requests to retrieve the current location of a specified user.
+     *
+     * @param String userName 
+     * @return Json representing the user's current location
+     */
     @RequestMapping("/getLocation") 
     public VisitedLocation getLocation(@RequestParam String userName) {
     	return tourGuideService.getUserLocation(tourGuideService.getUser(userName));
     }
-
+    
+    /**
+     * Handles HTTP GET requests to retrieve nearby attractions for a specified user.
+     *
+     * @param String userName
+     * @return Json object representing attractions near the user
+     */
     @RequestMapping("/getNearbyAttractions") 
     public AttractionsProximity getNearbyAttractions(@RequestParam String userName) {
     	return tourGuideService.getNearByAttractions(userName);
     }
     
+    /**
+     * Handles HTTP GET requests to retrieve all rewards for a specified user.
+     *
+     * @param String userName 
+     * @return Json listing user's rewards
+     */
     @RequestMapping("/getRewards") 
     public List<UserReward> getRewards(@RequestParam String userName) {
     	return tourGuideService.getUserRewards(tourGuideService.getUser(userName));
     }
        
+    /**
+     * Retrieve available trip deals for a specified user.
+     *
+     * @param String userName 
+     * @return Json listing available trip deals
+     */
     @RequestMapping("/getTripDeals")
     public List<Provider> getTripDeals(@RequestParam String userName) {
     	return tourGuideService.getTripDeals(tourGuideService.getUser(userName));
