@@ -1,12 +1,4 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Java CI avec Maven - DEV
+name: Java CI with Maven - DEV
 
 on:
   push:
@@ -15,12 +7,12 @@ on:
     branches: [ "dev" ]
 
 jobs:
-  build:
 
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Vérifier le code
+    - name: Check code
       uses: actions/checkout@v4
       
     - name: Set up JDK 17
@@ -30,16 +22,18 @@ jobs:
         distribution: 'temurin'
         cache: maven
         
+    - name: Install libs "gpsUtil", "rewardCentral", and "tripPricer".
+      working-directory: TourGuide 
+      run: |
+        mvn install:install-file -Dfile=./libs/gpsUtil.jar -DgroupId=gpsUtil -DartifactId=gpsUtil -Dversion="1.0.0" -Dpackaging=jar
+        mvn install:install-file -Dfile=./libs/RewardCentral.jar -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion="1.0.0" -Dpackaging=jar
+        mvn install:install-file -Dfile=./libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion="1.0.0" -Dpackaging=jar
+        
     - name: Build with Maven
       run: mvn -B clean install --file TourGuide/pom.xml
 
-    - name: Téléverser l'Artifact
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: artifact-dev-build
-        path: target/*.jar
-        retention-days: 1 
-
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+        path: TourGuide/target/*.jar 
